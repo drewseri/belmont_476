@@ -4,5 +4,18 @@
     <string name="app_name">MSU Proximity</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="servicemanage">Manage Location Service</string>
+    <string name="title_activity_service">ServiceActivity</string>
+    <string name="serivce">Location Service is Currently: </string>
+    <string name="regyes">STARTED</string>
+    <string name="regno">STOPPED</string>
+    <string name="dummy">dummy</string>
+    <string name="reg">Start</string>
+    <string name="unreg">Stop</string>
+    <string name="local_service_started">Local Service Started</string>
+    <string name="local_service_stopped">Local Service Stopped</string>
+    <string name="local_service_label">Local Service</string>
+    <string name="back">Back to Main Screen</string>
 
 </resources>
