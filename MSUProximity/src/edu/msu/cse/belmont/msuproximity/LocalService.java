@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
@@ -16,6 +17,10 @@ public class LocalService extends Service {
     // Unique Identification Number for the Notification.
     // We use it on Notification start, and to cancel it.
     private int NOTIFICATION = R.string.local_service_started;
+    
+    //Create the alarm
+    Alarm alarm = new Alarm();
+    
 
     /**
      * Class for clients to access.  Because we know this service always
@@ -39,10 +44,21 @@ public class LocalService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("LocalService", "Received start id " + startId + ": " + intent);
+        
+        // Set alarm
+        alarm.SetAlarm(LocalService.this);
+        
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.
         return START_STICKY;
     }
+    
+    // *** I don't know if we need this service function or not for the alarm
+    // *** I added it but its commented out for now 
+//    public void onStart(Context context,Intent intent, int startId)
+//    {
+//        alarm.SetAlarm(context);
+//    }
 
     @Override
     public void onDestroy() {
