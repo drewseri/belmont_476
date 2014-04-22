@@ -6,7 +6,12 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
@@ -19,9 +24,15 @@ public class LocalService extends Service {
     private int NOTIFICATION = R.string.local_service_started;
     
     //Create the alarm
-    Alarm alarm = new Alarm();
+    private Alarm alarm = new Alarm();
     
-
+    private LocationManager locationManager = null;
+    private ActiveListener activeListener = new ActiveListener();
+    
+    private double latitude = 0;
+    private double longitude = 0;
+    private boolean valid = false;
+    
     /**
      * Class for clients to access.  Because we know this service always
      * runs in the same process as its clients, we don't need to deal with
@@ -37,8 +48,14 @@ public class LocalService extends Service {
     public void onCreate() {
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
+        
+        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        
         // Display a notification about us starting.  We put an icon in the status bar.
         showNotification();
+        
+        registerListeners();
+
     }
 
     @Override
@@ -64,6 +81,8 @@ public class LocalService extends Service {
     public void onDestroy() {
         // Cancel the persistent notification.
         mNM.cancel(NOTIFICATION);
+        
+        alarm.CancelAlarm(LocalService.this);
 
         // Tell the user we stopped.
         Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT).show();
@@ -101,5 +120,71 @@ public class LocalService extends Service {
         mNM.notify(NOTIFICATION, notification);
     }
     
+    private void registerListeners() {
+        unregisterListeners();
+        
+        // Create a Criteria object
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setPowerRequirement(Criteria.POWER_HIGH);
+        criteria.setAltitudeRequired(true);
+        criteria.setBearingRequired(false);
+        criteria.setSpeedRequired(false);
+        criteria.setCostAllowed(false);
+        
+        String bestAvailable = locationManager.getBestProvider(criteria, true);
+
+        if(bestAvailable != null) {
+            //locationManager.requestLocationUpdates(bestAvailable, 500, 1, activeListener);
+            //TextView viewProvider = (TextView)findViewById(R.id.textProvider);
+            //viewProvider.setText(bestAvailable);
+        }
+    }
+    
+    private void unregisterListeners() {
+        locationManager.removeUpdates(activeListener);
+    }
+    
+    private void onLocation(Location location) {
+        if(location == null) {
+            return;
+        }
+        
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        valid = true;
+        
+        Log.i("LAT", ""+latitude);
+
+    }
+    
+    private class ActiveListener implements LocationListener {
+
+		@Override
+		public void onLocationChanged(Location location) {
+            onLocation(location);
+			
+		}
+
+		@Override
+		public void onProviderDisabled(String provider) {
+        	registerListeners();            
+			
+		}
+
+		@Override
+		public void onProviderEnabled(String provider) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+			// TODO Auto-generated method stub
+			
+		}
+
+        
+    };
     
 }
