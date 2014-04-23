@@ -47,20 +47,20 @@ public class LocalService extends Service {
     @Override
     public void onCreate() {
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-
         
         locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         
         // Display a notification about us starting.  We put an icon in the status bar.
         showNotification();
         
-        registerListeners();
-
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("LocalService", "Received start id " + startId + ": " + intent);
+        
+        registerListeners();
+        
         
         // Set alarm
         alarm.SetAlarm(LocalService.this);
@@ -81,6 +81,8 @@ public class LocalService extends Service {
     public void onDestroy() {
         // Cancel the persistent notification.
         mNM.cancel(NOTIFICATION);
+        
+        unregisterListeners();
         
         alarm.CancelAlarm(LocalService.this);
 
@@ -133,11 +135,11 @@ public class LocalService extends Service {
         criteria.setCostAllowed(false);
         
         String bestAvailable = locationManager.getBestProvider(criteria, true);
-
+        
         if(bestAvailable != null) {
-            //locationManager.requestLocationUpdates(bestAvailable, 500, 1, activeListener);
-            //TextView viewProvider = (TextView)findViewById(R.id.textProvider);
-            //viewProvider.setText(bestAvailable);
+            locationManager.requestLocationUpdates(bestAvailable, 500, 1, activeListener);
+            Location location = locationManager.getLastKnownLocation(bestAvailable);
+            onLocation(location);
         }
     }
     
@@ -154,6 +156,9 @@ public class LocalService extends Service {
         longitude = location.getLongitude();
         valid = true;
         
+        
+        //alarm.set(latitude);
+
         Log.i("LAT", ""+latitude);
 
     }

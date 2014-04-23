@@ -9,6 +9,8 @@ import android.widget.Toast;
 
 public class Alarm extends BroadcastReceiver 
 {    
+	private double interval;
+	
      @Override
      public void onReceive(Context context, Intent intent) 
      {   
@@ -38,4 +40,9 @@ public class Alarm extends BroadcastReceiver
      alarmManager.cancel(sender);
  	}
 
+ public void set (double i){
+	 interval = i;
+ }
+	 
+	 
 }
