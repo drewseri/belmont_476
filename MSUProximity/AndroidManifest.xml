@@ -41,6 +41,24 @@
             android:name="edu.msu.cse.belmont.msuproximity.ServiceActivity"
             android:label="@string/title_activity_service" >
         </activity>
+        <activity
+            android:name="edu.msu.cse.belmont.msuproximity.BeaumontInfoActivity"
+            android:label="@string/title_activity_beaumont_info" 
+            android:parentActivityName=".MainActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value=".MainActivity"/>
+        </activity>
+        <activity
+            android:name="edu.msu.cse.belmont.msuproximity.SpartyInfoActivity"
+            android:label="@string/title_activity_sparty_info"
+            android:parentActivityName=".MainActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value=".MainActivity"/>
+        </activity>
+        <activity
+            android:name="edu.msu.cse.belmont.msuproximity.BreslinInfoActivity"
+            android:label="@string/title_activity_breslin_info"  
+            android:parentActivityName=".MainActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value=".MainActivity"/>
+        </activity>
     </application>
 
 </manifest>
