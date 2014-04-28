@@ -35,19 +35,38 @@
         android:text="@string/dummy"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:paddingBottom="100dp"
+        android:paddingTop="100dp" >
+
+        <Button
+            android:id="@+id/buttonReg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:onClick="onStartService"
+            android:text="@string/reg" />
+
+        <Button
+            android:id="@+id/buttonUnreg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left|center_vertical"
+            android:onClick="onStopService"
+            android:text="@string/unreg" />
+
+    </LinearLayout>
+
     <Button
         android:id="@+id/buttonBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:gravity="left|center_vertical"
         android:onClick="onBack"
         android:text="@string/back" />
-
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="onStartService"
-        android:text="Start service" />
 
 </LinearLayout>
