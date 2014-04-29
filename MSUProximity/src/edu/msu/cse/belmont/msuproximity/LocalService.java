@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
@@ -13,6 +14,7 @@ import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -147,6 +149,104 @@ public class LocalService extends Service {
         locationManager.removeUpdates(activeListener);
     }
     
+
+    public void checkIfWeShouldSendANotification() {
+
+        //
+    	// Determine which zone we are in
+    	//
+    	
+        String zoneWeAreIn=null;
+        
+        double spartyLat = 42.731138;
+        double spartyLong = -84.487508;
+       
+        double beaumontLat = 42.732829;
+        double beaumontLong = -84.482467;
+        
+        double bresLat = 42.7284;
+        double bresLong = -84.492033;
+
+    	float[] spartyDist = new float[1];
+    	Location.distanceBetween(latitude,longitude, spartyLat, spartyLong, spartyDist);
+
+    	float[] beaumontDist = new float[1];
+    	Location.distanceBetween(latitude,longitude, beaumontLat, beaumontLong, beaumontDist);
+    	
+    	float[] bresDist = new float[1];
+    	Location.distanceBetween(latitude,longitude, bresLat, bresLong, bresDist);
+    	
+    	if(spartyDist[0]<20) zoneWeAreIn = "Sparty";
+    	else if (beaumontDist[0]<20) zoneWeAreIn = "Beaumont Tower";
+    	else if (bresDist[0]<20) zoneWeAreIn = "the Breslin Center";
+        
+    	
+    	
+        // Create an artificial back stack
+        // This is so when we open the notification, back takes us to MainActivity
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        
+        
+        if(zoneWeAreIn!=null)
+        {
+	         Intent newIntent = new Intent();                    
+	         if(zoneWeAreIn=="Sparty")
+	         {
+	        	 // Set parent in artificial back stack
+		         stackBuilder.addParentStack(SpartyInfoActivity.class);
+		         
+		         // Make it start up SpartyInfoActivity
+	        	 newIntent.setClassName(this, "edu.msu.cse.belmont.msuproximity.SpartyInfoActivity");     	
+	         }
+	         else if(zoneWeAreIn=="Beaumont Tower")
+	         {
+		         stackBuilder.addParentStack(BeaumontInfoActivity.class);
+	        	 newIntent.setClassName(this, "edu.msu.cse.belmont.msuproximity.BeaumontInfoActivity");
+	         }
+	         else if(zoneWeAreIn=="the Breslin Center")
+	         {
+		         stackBuilder.addParentStack(BreslinInfoActivity.class);
+	        	 newIntent.setClassName(this, "edu.msu.cse.belmont.msuproximity.BreslinInfoActivity");
+	         }
+	         else 
+	         {
+	        	 // Default, if zoneWeAreIn is not one of the above
+		         Toast.makeText(this, "Wrong zone string name", Toast.LENGTH_LONG).show();
+		         newIntent.setClassName(this, "edu.msu.cse.belmont.msuproximity.MainActivity");
+	         }
+	         newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+	         
+	         
+	         // Finish setting up artifical back stack
+	         stackBuilder.addNextIntent(newIntent);
+	         
+	         // Create a pending intent so it's only launched if clicked
+	         PendingIntent pendingIntent =
+	         stackBuilder.getPendingIntent(
+	         0,
+	         PendingIntent.FLAG_UPDATE_CURRENT
+	         );
+	         	
+	         // Create the android notification
+	         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+	         builder.setSmallIcon(R.drawable.ic_launcher);
+	         builder.setContentTitle(this.getString(R.string.app_name));
+	         builder.setContentText(this.getString(R.string.youre_at) + " "+zoneWeAreIn);
+	         builder.setAutoCancel(true);
+	         builder.setContentIntent(pendingIntent);
+	         NotificationManager mNotificationManager =
+	         (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+	         
+	         // Launch the android notification
+	         mNotificationManager.notify(0, builder.build());
+        }
+        else
+        {
+        	Log.i("not in any zone. "+spartyDist[0]+" "+beaumontDist[0]+" "+bresDist[0], "Not in any zone right now.");
+	         //Toast.makeText(this, "Alarm went off but we are not in a zone", Toast.LENGTH_LONG).show();
+        }
+    }
+    
     private void onLocation(Location location) {
         if(location == null) {
             return;
@@ -155,8 +255,9 @@ public class LocalService extends Service {
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         valid = true;
+       
         
-        
+        checkIfWeShouldSendANotification();
         //alarm.set(latitude);
 
         Log.i("LAT", ""+latitude);
